@@ -1,8 +1,8 @@
-import Carousel from "../components/carousel";
-import NewsCarousel from "../components/card";
-import Forms from "../components/forms";
-import BitcoinChart from "../components/cryptoChart";
-import Title from "../components/title";
+import Carousel from "../components/carousel/carousel";
+import NewsCarousel from "../components/card/card";
+import Forms from "../components/forms/forms";
+import BitcoinChart from "../components/cryptoChart/cryptoChart";
+import Title from "../components/title/title";
 
 const newsItems = [
   {

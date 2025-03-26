@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useForm, ValidationError } from "@formspree/react";
+import { showSuccessMessage, resetForm } from "./formsUtils";
 
 export default function Forms() {
   const [state, handleSubmit] = useForm("xwpvdkob");
@@ -12,7 +13,7 @@ export default function Forms() {
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-md text-center">
-            <p className="text-green-500 text-lg">Message sent succesfully!</p>
+            <p className="text-green-500 text-lg">Message sent successfully!</p>
             <button
               onClick={() => setShowPopup(false)}
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
@@ -28,8 +29,8 @@ export default function Forms() {
           e.preventDefault();
           await handleSubmit(e);
           if (state.succeeded) {
-            setShowPopup(true);
-            setFormKey((prevKey) => prevKey + 1);
+            showSuccessMessage(setShowPopup); // Exibe a mensagem de sucesso
+            resetForm(setFormKey); // Reseta o formulário
           }
         }}
         className="w-[90%] p-6 bg-white flex flex-col justify-center items-center"

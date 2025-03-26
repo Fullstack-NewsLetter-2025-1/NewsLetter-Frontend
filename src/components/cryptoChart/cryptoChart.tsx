@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import type { ChartData, ChartOptions } from "chart.js";
+import type { ChartData } from "chart.js";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +13,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import {
+  fetchBitcoinPrice,
+  fetchEthereumPrice,
+  bitcoinOptions,
+  ethereumOptions,
+} from "./cryptoChartUtils";
 
 // Registra os componentes necessários do Chart.js
 ChartJS.register(
@@ -35,46 +41,22 @@ const CryptoCharts: React.FC = () => {
   const [ethereumData, setEthereumData] = useState<DataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Busca o preço do Bitcoin
-  const fetchBitcoinPrice = async () => {
-    try {
-      const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
-      );
-      const data = await res.json();
-      const price = data.bitcoin.usd;
-      const now = new Date().toLocaleTimeString();
-      setBitcoinData((prev) => [...prev, { time: now, price }]);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Erro ao buscar dados do Bitcoin:", error);
-    }
-  };
-
-  // Busca o preço do Ethereum
-  const fetchEthereumPrice = async () => {
-    try {
-      const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
-      );
-      const data = await res.json();
-      const price = data.ethereum.usd;
-      const now = new Date().toLocaleTimeString();
-      setEthereumData((prev) => [...prev, { time: now, price }]);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Erro ao buscar dados do Ethereum:", error);
-    }
-  };
-
   // Busca inicial e atualização a cada 1 minuto
   useEffect(() => {
-    fetchBitcoinPrice();
-    fetchEthereumPrice();
-    const interval = setInterval(() => {
-      fetchBitcoinPrice();
-      fetchEthereumPrice();
-    }, 60000);
+    const fetchData = async () => {
+      try {
+        const bitcoin = await fetchBitcoinPrice();
+        const ethereum = await fetchEthereumPrice();
+        setBitcoinData((prev) => [...prev, bitcoin]);
+        setEthereumData((prev) => [...prev, ethereum]);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -100,38 +82,10 @@ const CryptoCharts: React.FC = () => {
         label: "Preço do Ethereum (USD)",
         data: ethereumData.map((point) => point.price),
         fill: false,
-        borderColor: "rgba(235, 64, 52, 1)", // cor diferenciada para o Ethereum
+        borderColor: "rgba(235, 64, 52, 1)",
         tension: 0.1,
       },
     ],
-  };
-
-  // Configuração do eixo Y para o gráfico do Bitcoin
-  const bitcoinOptions: ChartOptions<"line"> = {
-    scales: {
-      y: {
-        min: 85000,
-        max: 87000,
-        ticks: {
-          stepSize: 500,
-          callback: (value) => `$${value}`,
-        },
-      },
-    },
-  };
-
-  // Configuração do eixo Y para o gráfico do Ethereum (ajuste os valores conforme o range esperado)
-  const ethereumOptions: ChartOptions<"line"> = {
-    scales: {
-      y: {
-        min: 1900,
-        max: 2500,
-        ticks: {
-          stepSize: 100,
-          callback: (value) => `$${value}`,
-        },
-      },
-    },
   };
 
   return (

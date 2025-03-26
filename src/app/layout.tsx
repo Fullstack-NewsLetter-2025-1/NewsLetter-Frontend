@@ -1,8 +1,8 @@
 import { Orbitron, Inter } from "next/font/google";
 import "./globals.css";
-import ParticlesBackground from "../components/particlesBackground";
-import Footer from "../components/footer";
-import Header from "../components/header";
+import ParticlesBackground from "../components/particlesBackground/particlesBackground";
+import Footer from "../components/footer/footer";
+import Header from "../components/header/header";
 
 // Configuração da Orbitron
 const orbitron = Orbitron({

@@ -1,19 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Logo from "./logo";
+import { useRouter } from "next/navigation"; // Para redirecionar o usuário
+import Logo from "../logo/logo";
+import SearchBar from "../searchBar/searchBar"; // Importando o componente SearchBar
+import {
+  isScrolledPast,
+  isWindowWidthAtLeast,
+  generateMenuLinks,
+} from "./headerUtils";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter(); // Hook para redirecionar
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(isScrolledPast(window.scrollY, 100));
     };
 
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      if (isWindowWidthAtLeast(window.innerWidth, 768)) {
         setIsMenuOpen(false);
       }
     };
@@ -29,6 +37,12 @@ export default function Header() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      router.push(`/searchPage?query=${encodeURIComponent(query)}`); // Redireciona para a página de busca
+    }
   };
 
   return (
@@ -64,31 +78,11 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center gap-8">
           {/* Barra de busca animada (Desktop) */}
-          <div
-            className={`overflow-hidden transition-all duration-500 ${
-              isScrolled ? "w-64 opacity-100" : "w-0 opacity-0"
-            }`}
-          >
-            <input
-              type="text"
-              placeholder="Pesquisar notícias..."
-              className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <SearchBar isVisible={isScrolled} onSearch={handleSearch} />
 
           {/* Menu tradicional (Desktop) */}
           <ul className="flex gap-8 orbitron-text text-xl">
-            {["Home", "Contact", "About"].map((item) => (
-              <li key={item} className="group relative">
-                <a
-                  href={`#${item.toLowerCase()}`}
-                  className="relative block py-2 hover:text-red-800 transition-colors duration-300"
-                >
-                  {item}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
-                </a>
-              </li>
-            ))}
+            {generateMenuLinks(["Home", "Contact", "About"])}
           </ul>
         </nav>
 
@@ -108,27 +102,11 @@ export default function Header() {
         >
           <div className="p-6">
             {/* Search Bar Mobile */}
-            <div className="mb-8">
-              <input
-                type="text"
-                placeholder="Pesquisar..."
-                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <SearchBar onSearch={handleSearch} />
 
             {/* Mobile Menu Items */}
             <ul className="space-y-6">
-              {["Home", "Contact", "About"].map((item) => (
-                <li key={item}>
-                  <a
-                    href={`#${item.toLowerCase()}`}
-                    className="block py-2 text-lg hover:text-red-800 transition-colors"
-                    onClick={toggleMenu}
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
+              {generateMenuLinks(["Home", "Contact", "About"], toggleMenu)}
             </ul>
           </div>
         </div>
