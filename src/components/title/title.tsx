@@ -1,6 +1,4 @@
-interface TitleProps {
-  title: string;
-}
+import { TitleProps } from "./titleInterface";
 
 export default function Title({ title }: TitleProps) {
   return (

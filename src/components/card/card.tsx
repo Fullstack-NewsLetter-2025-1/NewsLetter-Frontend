@@ -21,7 +21,7 @@ export default function NewsCarousel({ items }: { items: NewsItem[] }) {
     <section className=" w-[90vw]">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Área Principal do Carrossel */}
-        <div className="lg:col-span-2 relative h-[60vh] lg:h-[77vh] overflow-hidden">
+        <div className="lg:col-span-2 relative h-[60vh] lg:h-[77vh] overflow-hidden rounded-xl">
           {items.map((item, index) => (
             <article
               key={item.id}

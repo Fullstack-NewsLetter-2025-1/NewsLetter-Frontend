@@ -89,7 +89,7 @@ export default function Forms() {
             id="message"
             name="message"
             className="w-full p-2 border-2 border-slate-600 rounded h-64 text-black"
-            placeholder="Digite sua mensagem..."
+            placeholder="Type your message..."
             required
           />
           <ValidationError
@@ -105,7 +105,7 @@ export default function Forms() {
           disabled={state.submitting}
           className="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700 transition-colors disabled:bg-gray-400 cursor-pointer"
         >
-          {state.submitting ? "Enviando..." : "Enviar Mensagem"}
+          {state.submitting ? "Sending..." : "Send message"}
         </button>
       </form>
     </div>

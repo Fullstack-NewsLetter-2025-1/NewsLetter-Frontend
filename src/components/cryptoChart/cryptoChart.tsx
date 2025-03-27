@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import TitleX from "../title/title";
 import { Line } from "react-chartjs-2";
 import type { ChartData } from "chart.js";
 import {
@@ -13,12 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {
-  fetchBitcoinPrice,
-  fetchEthereumPrice,
-  bitcoinOptions,
-  ethereumOptions,
-} from "./cryptoChartUtils";
+import { fetchBitcoinPrice, fetchEthereumPrice } from "./cryptoChartUtils";
 
 // Registra os componentes necessários do Chart.js
 ChartJS.register(
@@ -47,8 +43,8 @@ const CryptoCharts: React.FC = () => {
       try {
         const bitcoin = await fetchBitcoinPrice();
         const ethereum = await fetchEthereumPrice();
-        setBitcoinData((prev) => [...prev, bitcoin]);
-        setEthereumData((prev) => [...prev, ethereum]);
+        setBitcoinData(bitcoin);
+        setEthereumData(ethereum);
         setIsLoading(false);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
@@ -56,16 +52,43 @@ const CryptoCharts: React.FC = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 60000);
+    const interval = setInterval(fetchData, 60000); // Atualiza a cada 12 horas
     return () => clearInterval(interval);
   }, []);
+
+  // Função para calcular os limites dinâmicos do eixo Y
+  const getDynamicYAxisOptions = (data: DataPoint[]) => {
+    const prices = data.map((point) => point.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: false,
+          suggestedMin: minPrice * 0.99, // Define o mínimo como 95% do menor valor
+          suggestedMax: maxPrice * 1.02, // Define o máximo como 105% do maior valor
+          ticks: {
+            callback: function (tickValue: string | number) {
+              if (typeof tickValue === "number") {
+                return `$${tickValue.toFixed(0)}`; // Formata os valores do eixo Y
+              }
+              return tickValue;
+            },
+          },
+        },
+      },
+    };
+  };
 
   // Dados para o gráfico do Bitcoin
   const bitcoinChartData: ChartData<"line"> = {
     labels: bitcoinData.map((point) => point.time),
     datasets: [
       {
-        label: "Preço do Bitcoin (USD)",
+        label: "Bitcoin Price (USD)",
         data: bitcoinData.map((point) => point.price),
         fill: false,
         borderColor: "rgba(34, 211, 238, 1)",
@@ -79,7 +102,7 @@ const CryptoCharts: React.FC = () => {
     labels: ethereumData.map((point) => point.time),
     datasets: [
       {
-        label: "Preço do Ethereum (USD)",
+        label: "Ethereum Price (USD)",
         data: ethereumData.map((point) => point.price),
         fill: false,
         borderColor: "rgba(235, 64, 52, 1)",
@@ -90,26 +113,32 @@ const CryptoCharts: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center relative z-10 mb-10">
-      <h2 className="text-2xl font-bold mb-8 text-center">
-        Criptomoedas em Tempo Real
-      </h2>
+      <TitleX title={"Crypto quotation in real time"}></TitleX>
       {isLoading ? (
-        <p className="text-center">Carregando dados...</p>
+        <p className="text-center">Loading data...</p>
       ) : (
         <div className="flex flex-col lg:flex-row flex-wrap justify-center gap-8">
           {/* Gráfico do Bitcoin */}
-          <div className="w-[90vw] h-[30vh] lg:w-[40vw] lg:h-[40vh] flex flex-col px-4 py-12 bg-gray-50 rounded-lg shadow-2xl justify-center items-center">
+          <div className="w-[90vw] h-[30vh] lg:w-[45vw] lg:h-[50vh] flex flex-col px-3.5 py-12 bg-gray-50 rounded-lg shadow-2xl justify-center items-center relative overflow-hidden border-1 border-red-900">
             <h3 className="text-xl font-bold mb-4 text-center">
-              Preço do Bitcoin (USD)
+              Bitcoin Price (USD)
             </h3>
-            <Line data={bitcoinChartData} options={bitcoinOptions} />
+            <Line
+              data={bitcoinChartData}
+              options={getDynamicYAxisOptions(bitcoinData)}
+              className="w-full h-full"
+            />
           </div>
           {/* Gráfico do Ethereum */}
-          <div className="w-[90vw] h-[30vh] lg:w-[40vw] lg:h-[40vh] flex flex-col py-12 bg-gray-50 rounded-lg shadow-2xl justify-center items-center">
+          <div className="w-[90vw] h-[30vh] lg:w-[45vw] lg:h-[50vh] flex flex-col px-3.5 py-12 bg-gray-50 rounded-lg shadow-2xl justify-center items-center relative overflow-hidden border-1 border-red-900">
             <h3 className="text-xl font-bold mb-4 text-center">
-              Preço do Ethereum (USD)
+              Ethereum Price (USD)
             </h3>
-            <Line data={ethereumChartData} options={ethereumOptions} />
+            <Line
+              data={ethereumChartData}
+              options={getDynamicYAxisOptions(ethereumData)}
+              className="w-full h-full"
+            />
           </div>
         </div>
       )}
