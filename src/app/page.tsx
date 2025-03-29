@@ -50,6 +50,18 @@ export default function Home() {
             description: "Descrição detalhada do segundo slide do carrossel.",
             buttonText: "Ver Detalhes",
           },
+          {
+            image: "/assets/images/new-york-1867569.jpg",
+            title: "Segundo Slide",
+            description: "Descrição detalhada do segundo slide do carrossel.",
+            buttonText: "Ver Detalhes",
+          },
+          {
+            image: "/assets/images/new-york-1867569.jpg",
+            title: "Segundo Slide",
+            description: "Descrição detalhada do segundo slide do carrossel.",
+            buttonText: "Ver Detalhes",
+          },
         ]}
       ></Carousel>
       <section className="flex flex-col items-center justify-center w-full">

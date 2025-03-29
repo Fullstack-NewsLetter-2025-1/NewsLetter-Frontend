@@ -4,20 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Para redirecionar o usuário
 import Logo from "../logo/logo";
 import SearchBar from "../searchBar/searchBar"; // Importando o componente SearchBar
-import {
-  isScrolledPast,
-  isWindowWidthAtLeast,
-  generateMenuLinks,
-} from "./headerUtils";
+import { isWindowWidthAtLeast, generateMenuLinks } from "./headerUtils";
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // Estado para monitorar o scroll
   const router = useRouter(); // Hook para redirecionar
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(isScrolledPast(window.scrollY, 100));
+      setIsScrolled(window.scrollY > 10); // Define como true se o scroll for maior que 0
     };
 
     const handleResize = () => {
@@ -47,7 +43,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed w-full top-0 left-0 z-50 px-4 md:px-12 transition-all duration-300 ${
+      className={`fixed w-full top-0 left-0 z-50 px-4 md:px-12 transition-all duration-300 shadow-md ${
         isScrolled ? "bg-white shadow-md" : "bg-transparent shadow-none"
       }`}
     >
@@ -77,8 +73,8 @@ export default function Header() {
         </button>
 
         <nav className="hidden md:flex items-center gap-8">
-          {/* Barra de busca animada (Desktop) */}
-          <SearchBar isVisible={isScrolled} onSearch={handleSearch} />
+          {/* Barra de busca sempre visível (Desktop) */}
+          <SearchBar isVisible={true} onSearch={handleSearch} />
 
           {/* Menu tradicional (Desktop) */}
           <ul className="flex gap-8 orbitron-text text-xl">
